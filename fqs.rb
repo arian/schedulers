@@ -1,13 +1,14 @@
 
 require "./tasks"
+require "thread"
 
 # new thread that reads stdin (the while blocks other stuff)
-Thread.new do
+p1 = Thread.new do
 	isr_char while $char = STDIN.getc
 end
 
 # function queue
-$queue = Array.new
+$queue = Queue.new
 
 # interrupt service routine
 def isr_char
@@ -16,7 +17,13 @@ def isr_char
 	$queue.push(Tasks.C) if $char == 'c'
 end
 
-# main loop
-while true
-	$queue.pop() if not $queue.empty?
+main = Thread.new do
+	# main loop
+	loop do
+		task = $queue.pop
+		task
+	end
 end
+
+p1.join
+main.join
