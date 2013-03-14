@@ -1,18 +1,27 @@
 
+require 'tweetstream'
 require "./tasks"
+require './configure'
 
-# new thread that reads stdin (the while blocks other stuff) that calls the isr
-p1 = Thread.new do
-	irs_char while $char = STDIN.getc
-end
+$tweet = ""
+
+$word1 = "ubuntu"
+$word2 = "linux"
+$word3 = "apple"
 
 # interrupt service routine
-def irs_char
-	$t1.wakeup if $char == 'a'
-	$t2.wakeup if $char == 'b'
-	$t3.wakeup if $char == 'c'
+def irs_tweet
+	$t1.wakeup if not $tweet.index($word1).nil?
+	$t2.wakeup if not $tweet.index($word2).nil?
+	$t3.wakeup if not $tweet.index($word3).nil?
 end
 
+p1 = Thread.new do
+	TweetStream::Client.new.track($word1, $word2, $word3) do |status|
+		$tweet = status.text.downcase
+		irs_tweet
+	end
+end
 
 $t1 = Thread.new do
 	loop do
