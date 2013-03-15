@@ -10,7 +10,7 @@ $word2 = "one direction" # too much tweets
 $word1 = "bieber" # way way too much
 $word3 = "muse" # not enough
 
-# this fetches tweets through some stream and calls the isr
+# this fetches tweets through some stream and puts them in the $tweet "register"
 p1 = Thread.new do
 	TweetStream::Client.new.track($word1, $word2, $word3) do |status|
 		$tweet = status.text.downcase
