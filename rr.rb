@@ -4,43 +4,36 @@ require "./tasks"
 require './configure'
 
 # tweet is basically some peripheral register here
-$tweet = ""
-
-$word2 = "one direction" # too much tweets
-$word1 = "bieber" # way way too much
-$word3 = "muse" # not enough
+$tweets = Array.new(3)
+$words = ["one direction", "bieber", "muse"]
+$tasks = [-> { Tasks.A }, -> { Tasks.B }, -> { Tasks.C }]
 
 # this fetches tweets through some stream and puts them in the $tweet "register"
-p1 = Thread.new do
-	TweetStream::Client.new.track($word1, $word2, $word3) do |status|
-		$tweet = status.text.downcase
+
+p = $words.each_with_index.map do |word, i|
+	Thread.new do
+		TweetStream::Client.new.track(word) do |status|
+			$tweets[i] = status.text.downcase
+		end
 	end
 end
 
 p2 = Thread.new do
 	loop do
 
-		# save in local variable to prevent shared data bug
-		tweet = $tweet
-		if not tweet.index($word1).nil?
-			puts tweet.cyan
-			Tasks.A
-		end
+		$words.each_with_index { |word, i|
+			# save in local variable to prevent shared data bug
+			tweet = $tweets[i]
+			if not tweet.nil? and not tweet.index($words[i]).nil?
+				puts tweet.cyan
+				$tasks[i].call
+				$tweets[i] = nil
+			end
 
-		tweet = $tweet
-		if not tweet.index($word2).nil?
-			puts tweet.cyan
-			Tasks.B
-		end
-
-		tweet = $tweet
-		if not tweet.index($word3).nil?
-			puts tweet.cyan
-			Tasks.C
-		end
+		}
 
 	end
 end
 
 p2.join
-p1.join
+p.each { |t| t.join }
