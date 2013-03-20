@@ -13,7 +13,7 @@ $tasks = [-> { Tasks.A }, -> { Tasks.B }, -> { Tasks.C }]
 p = $words.each_with_index.map do |word, i|
 	Thread.new do
 		TweetStream::Client.new.track(word) do |status|
-			$tweets[i] = status.text.downcase
+			$tweets[i] = status.text
 		end
 	end
 end
@@ -24,7 +24,7 @@ p2 = Thread.new do
 		$words.each_with_index { |word, i|
 			# save in local variable to prevent shared data bug
 			tweet = $tweets[i]
-			if not tweet.nil? and not tweet.index($words[i]).nil?
+			if not tweet.nil?
 				puts tweet.cyan
 				$tasks[i].call
 				$tweets[i] = nil
