@@ -8,7 +8,7 @@ $tweets = Array.new(3)
 $words = ["one direction", "bieber", "muse"]
 $tasks = [-> { Tasks.A }, -> { Tasks.B }, -> { Tasks.C }]
 
-# this fetches tweets through some stream and puts them in the $tweet "register"
+# this fetches tweets through some stream and puts them in the $tweets "register"
 
 p = $words.each_with_index.map do |word, i|
 	Thread.new do
