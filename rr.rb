@@ -3,8 +3,9 @@ require 'tweetstream'
 require "./tasks"
 require './configure'
 
-# tweet is basically some peripheral register here
+# tweets is basically some peripheral register here
 $tweets = Array.new(3)
+# the words to search for
 $words = ["one direction", "bieber", "muse"]
 $tasks = [-> { Tasks.A }, -> { Tasks.B }, -> { Tasks.C }]
 
@@ -21,11 +22,14 @@ end
 p2 = Thread.new do
 	loop do
 
+		# for each word
 		$words.each_with_index { |word, i|
 			# save in local variable to prevent shared data bug
 			tweet = $tweets[i]
+			# check if it is not empty
 			if not tweet.nil?
 				puts tweet.cyan
+				# execute task
 				$tasks[i].call
 				$tweets[i] = nil
 			end

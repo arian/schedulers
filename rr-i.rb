@@ -35,9 +35,12 @@ end
 p1 = Thread.new do
 	loop do
 
+		# for each flag
 		$flags = $flags.each_with_index do |flag, i|
+			# if flag is true, execute task
 			if flag
 				$tasks[i].call
+				# and reset the flag to false
 				$flags[i] = false
 			end
 		end

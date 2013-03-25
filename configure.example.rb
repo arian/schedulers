@@ -1,3 +1,4 @@
+# rename this to configure.rb and fill in the correct values
 
 TweetStream.configure do |config|
 	config.consumer_key       = 'abcdefghijklmnopqrstuvwxyz'
