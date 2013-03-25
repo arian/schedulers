@@ -26,7 +26,7 @@ end
 $queue = Queue.new
 
 # interrupt service routine that puts the task in the queue
-$isrs = $flags.each_with_index.map do |f, i|
+$isrs = $words.each_with_index.map do |w, i|
 	-> {
 		puts $tweets[i].cyan
 		$queue.push($tasks[i])
