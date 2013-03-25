@@ -20,22 +20,22 @@ $word3 = "apple"
 
 # interrupt service routine
 def irs_tweet
-	if not $tweet.index($word1).nil? and $t1[:status] != $_ready
+	if not $tweet.index($word1).nil? and $t1[:state] != $_ready
 		puts "interrupt %s" % $word1
 		$atweet = $tweet
-		$t1[:status] = $_ready
+		$t1[:state] = $_ready
 		$scheduler.wakeup # something changed, let the scheduler check things
 	end
 	if not $tweet.index($word2).nil?
-		puts "interrupt %s" % $word2 and $t2[:status] != $_ready
+		puts "interrupt %s" % $word2 and $t2[:state] != $_ready
 		$btweet = $tweet
-		$t2[:status] = $_ready
+		$t2[:state] = $_ready
 		$scheduler.wakeup
 	end
 	if not $tweet.index($word3).nil?
-		puts "interrupt %s" % $word3 and $t3[:status] != $_ready
+		puts "interrupt %s" % $word3 and $t3[:state] != $_ready
 		$ctweet = $tweet
-		$t3[:status] = $_ready
+		$t3[:state] = $_ready
 		$scheduler.wakeup
 	end
 end
@@ -53,20 +53,20 @@ def create_task(function, priority)
 	t = {
 		:th => Thread.new do
 			loop do
-				t[:status] = $_ready
+				t[:state] = $_ready
 				puts "ready"
 				# let's do something else
 				$scheduler.wakeup
 
 				# block until the task is ready again
-				t[:status] = $_blocked
+				t[:state] = $_blocked
 				Thread.stop
 
-				t[:status] = $_running
+				t[:state] = $_running
 				function.call
 			end
 		end,
-		:status => $_ready,
+		:state => $_ready,
 		:priority => priority
 	}
 end
@@ -82,7 +82,7 @@ $tasks = [$t1, $t2, $t3].sort { |x, y| y[:priority] - x[:priority] }
 # find next task with highest priority
 def next_task
 	$tasks.each do |t|
-		return t if t[:status] == $_ready
+		return t if t[:state] == $_ready
 	end
 	return nil
 end
@@ -98,7 +98,7 @@ $scheduler = Thread.new do
 		Thread.stop
 
 		# lets continue with current task, because we can't do preemting in ruby
-		if current && (current[:status] == $_running || current[:th].status == "run")
+		if current && (current[:state] == $_running || current[:th].status == "run")
 			next
 		end
 
@@ -111,7 +111,7 @@ $scheduler = Thread.new do
 		# if current && current[:th].status == "run" &&  t[:priority] > current[:priority]
 		# 	puts "PREEMPT prio %d" % current[:priority]
 		# 	current[:th].kill
-		# 	current[:status] = $_ready
+		# 	current[:state] = $_ready
 		# end
 
 		# next task
